@@ -95,3 +95,8 @@ docker run -v $(pwd)/data:/app/data pokepipeline
 ---
 
 **Data Source:** [PokéAPI](https://pokeapi.co/) | **Stack:** Python, Pydantic, SQLite
+
+## 🤝 Contributions
+Feel free to open an issue or pull request if you have ideas or improvements for the project.
+
+© [Diana Terraza] - MIT Licens
