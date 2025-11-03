@@ -51,8 +51,52 @@ All data validated before database insertion:
 - Catches errors early (before DB operations)
 - Self-documenting data contracts
 
-### 3. Idempotency
-`DROP TABLE IF EXISTS` ensures safe re-execution without data conflicts.
+### 3. 🧠 Design and Core Decisions
+
+#### 3.1 Data Transformation and Database Schema
+
+The PokeAPI data is naturally **nested and hierarchical**, which is often challenging for a relational database. To address this and satisfy the relational modeling requirement, the raw JSON structure is transformed into a normalized schema consisting of three tables, leveraging a **Many-to-Many relationship** for Pokémon types.
+
+**Database Schema Overview (SQLite):**
+
+| Table Name | Purpose | Key Fields | Relationship |
+| :--- | :--- | :--- | :--- |
+| `pokemon` | Stores core, unique attributes for each Pokémon. | `id` (PK), `name`, `height`, `weight` | PK |
+| `type` | A lookup table (dictionary) for all unique Pokémon types (e.g., 'fire', 'water'). | `id` (PK), `name` | PK |
+| `pokemon_type` | A **Junction Table** linking Pokémon to their specific types. This resolves the Many-to-Many relationship (a Pokémon has multiple types, and a type applies to many Pokémon). | `pokemon_id` (FK), `type_id` (FK) | FK to `pokemon` and `type` |
+
+#### 3.2 Key Mapping Decision:
+
+The critical transformation occurs when processing the `data['types']` array from the API response. For each type entry, the pipeline must:
+
+1.  Extract the type name (`data['types'][i]['type']['name']`).
+2.  Check the `type` table: **if the type doesn't exist, it is inserted**; otherwise, its existing `type.id` is retrieved.
+3.  The resolved `type_id` and the Pokémon's `id` are then used to insert a record into the `pokemon_type` junction table, along with the `slot` information.
+   
+#### 3.3 Entity-Relationship (ER) Diagram
+
+```mermaid
+erDiagram
+    POKEMON {
+        int id PK
+        string name
+        float height
+        float weight
+        int base_experience
+    }
+    TYPE {
+        int id PK
+        string name
+    }
+    POKEMON_TYPE {
+        int pokemon_id FK
+        int type_id FK
+        int slot
+    }
+
+    POKEMON ||--o{ POKEMON_TYPE : has
+    TYPE ||--o{ POKEMON_TYPE : belongs_to
+```
 
 ## 📋 Assumptions
 
