@@ -1,34 +1,34 @@
 import sqlite3
 from typing import List
-# Importamos Pydantic models para validación de tipos y tipado
+# Import Pydantic models for type validation and typing
 from models.pokemon_data import PokemonModel, TypeModel, PokemonTypeModel
 
-# Define la ruta para el archivo de base de datos SQLite
+# Define the path for the SQLite database file
 DATABASE_FILE = "pokemon_data.db"
 
 def create_tables(conn: sqlite3.Connection):
     """
-    Crea las tres tablas necesarias en la base de datos SQLite.
-    Implementa la estrategia DROP TABLE IF EXISTS para garantizar la idempotencia.
+    Creates the three necessary tables in the SQLite database.
+    Implements the DROP TABLE IF EXISTS strategy to ensure idempotency.
 
     Args:
-        conn: El objeto de conexión a la base de datos SQLite activo.
+        conn: The active SQLite database connection object.
     """
     cursor = conn.cursor()
 
-    # --- ESTRATEGIA DE IDEMPOTENCIA: DROP TABLE IF EXISTS ---
-    # Esto asegura que cada ejecución es limpia, eliminando las tablas
-    # en orden inverso de dependencia para evitar errores de llave foránea.
+    # --- IDEMPOTENCY STRATEGY: DROP TABLE IF EXISTS ---
+    # This ensures that each execution is clean, dropping the tables
+    # in reverse order of dependency to prevent foreign key errors.
     
-    # 1. Eliminar la tabla de unión primero
+    # 1. Drop the junction table first
     cursor.execute("DROP TABLE IF EXISTS pokemon_type;")
-    # 2. Eliminar las tablas principales
+    # 2. Drop the main tables
     cursor.execute("DROP TABLE IF EXISTS pokemon;")
     cursor.execute("DROP TABLE IF EXISTS type;")
     
     print("Old tables dropped (idempotency check).")
     
-    # --- CREACIÓN DE TABLAS ---
+    # --- TABLE CREATION ---
 
     # Table 1: pokemon (Core Data)
     cursor.execute("""
@@ -70,18 +70,18 @@ def load_data(
     pokemon_type_records: List[PokemonTypeModel]
 ):
     """
-    Conecta a la base de datos, crea (y limpia) las tablas, e inserta
-    todos los modelos Pydantic transformados.
+    Connects to the database, creates (and cleans up) the tables, and inserts
+    all transformed Pydantic models.
     
     Args:
-        pokemon_records: Lista de objetos PokemonModel validados.
-        type_records: Lista de objetos TypeModel validados.
-        pokemon_type_records: Lista de objetos PokemonTypeModel validados.
+        pokemon_records: List of validated PokemonModel objects.
+        type_records: List of validated TypeModel objects.
+        pokemon_type_records: List of validated PokemonTypeModel objects.
     """
-    conn = None # Inicializar conn fuera del try para el bloque finally
+    conn = None # Initialize conn outside the try for the finally block
     try:
         conn = sqlite3.connect(DATABASE_FILE)
-        # La llamada a create_tables ahora garantiza el DROP/CREATE
+        # The call to create_tables now ensures the DROP/CREATE
         create_tables(conn) 
         cursor = conn.cursor()
 
@@ -128,5 +128,5 @@ def load_data(
 
 
 # --- Example Integration of the Full Pipeline (for local testing) ---
-# NOTA: Esta sección puede ser omitida en la versión final del script para producción.
-# Para probar localmente, necesitarías importar y ejecutar el extractor y transformador primero.
+# NOTE: This section can be omitted in the final script version for production.
+# To test locally, you would need to import and run the extractor and transformer first.
