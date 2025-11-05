@@ -36,6 +36,20 @@ Output: `pokemon_data.db` SQLite database with normalized Pokémon data.
 
 **Design:** Many-to-Many relationship handles multiple types per Pokémon. `slot` preserves type ordering (primary/secondary).
 
+### 🔬 Pipeline Verification
+To confirm the successful execution of the ETL pipeline and the integrity of the normalized data, the resulting ``pokemon_data.db``SQLite file can be inspected using a database client like DBeaver.
+
+The screenshot below visually validates the **Many-to-Many** relationship implementation, showing how a single Pokémon (**Charizard**, p.id = 6) is correctly linked to its multiple types (``Type``) via the ``pokemon_type`` junction table, and the correct ``slot`` order (``priority``) is preserved.
+
+### Verification Result
+
+![DBeaver Query Verification: Charizard's Types](assets/dbeaver_verification.jpg)
+
+| pokemon\_name | Tipo | priority |
+| :--- | :--- | :--- |
+| Charizard | fire | 1 |
+| Charizard | flying | 2 |
+
 ## 🎯 Key Design Decisions
 
 ### 1. Type Normalization
