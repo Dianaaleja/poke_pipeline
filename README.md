@@ -43,7 +43,7 @@ The screenshot below visually validates the **Many-to-Many** relationship implem
 
 ### Verification Result
 
-![DBeaver Query Verification: Charizard's Types](assets/dbeaver_verification.png)
+![DBeaver Query Verification: Charizard's Types](assets/dbeaver_verification_1.png)
 
 | pokemon\_name | Tipo | priority |
 | :--- | :--- | :--- |
